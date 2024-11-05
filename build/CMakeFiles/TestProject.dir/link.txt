@@ -1,1 +1,1 @@
-/usr/bin/cc -rdynamic CMakeFiles/TestProject.dir/src/test.c.o -o TestProject 
+/usr/bin/c++ -std=c++14 -rdynamic CMakeFiles/TestProject.dir/src/main.cpp.o -o TestProject 
