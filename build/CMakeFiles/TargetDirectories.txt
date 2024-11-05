@@ -1,3 +1,0 @@
-/home/chy/code/practice_c-/build/CMakeFiles/TestProject.dir
-/home/chy/code/practice_c-/build/CMakeFiles/edit_cache.dir
-/home/chy/code/practice_c-/build/CMakeFiles/rebuild_cache.dir
