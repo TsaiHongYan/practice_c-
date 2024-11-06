@@ -32,8 +32,6 @@ class systemManager :public Manager
 {
     public:
     using Manager::Manager;
-    void operator +(systemGuard& guard);
-    void operator -(systemGuard& guard);
     void operator +(std::string& plate);
     void operator -(std::string& plate);
     void check();

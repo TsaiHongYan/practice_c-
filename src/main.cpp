@@ -5,7 +5,7 @@
 #include <customer.h>
 #include <info.h>
 /*----------------------------------------------------------------------------*/
-std::shared_ptr<Manager> create_manager(FILE* file)
+systemManager create_manager(std::fstream& file)
 {
     std::cout << "Please input age " << std::endl;
     int age;
@@ -25,17 +25,14 @@ std::shared_ptr<Manager> create_manager(FILE* file)
     std::cout << "Please input worktime" << std::endl;
     std::string worktime;
     std::cin >> tel;
-    fprintf(file, 
-            "wordID:%s,name:%s,age:%d,address:%s,tel%d, \
-            mode:1,worktime:%s \n",
-            wordID.c_str(),name.c_str(),age,address.c_str(), 
-            tel, worktime.c_str());
-
-    return std::make_shared<systemManager>(
-            age, name, address, wordID, tel, 1, worktime);
+    file<<"wordID:"<< wordID <<"name:"<<name<<"age"<< age
+        <<"address" << address << "tel" << tel << " mode:1,worktime:"
+        << worktime <<std::endl;
+    systemManager manager(age, name, address, wordID, tel, 1, worktime);
+    return manager;
 }
 
-std::shared_ptr<Manager> create_guard(FILE* file)
+systemGuard create_guard(std::fstream& file)
 {
     std::cout << "Please input age " << std::endl;
     int age;
@@ -55,26 +52,24 @@ std::shared_ptr<Manager> create_guard(FILE* file)
     std::cout << "Please input worktime" << std::endl;
     std::string worktime;
     std::cin >> tel;
-     fprintf(file, 
-            "wordID:%s,name:%s,age:%d,address:%s,tel%d, \
-            mode:0,worktime:%s \n",
-            wordID.c_str(),name.c_str(),age,address.c_str(), 
-            tel, worktime.c_str());
-    return std::make_shared<systemGuard>(
-            age, name, address, wordID, tel, 0, worktime);
+    file<<"wordID:"<< wordID <<"name:"<<name<<"age"<< age
+        <<"address" << address << "tel" << tel << " mode:0,worktime:"
+        << worktime <<std::endl;
+    systemGuard guard(age, name, address, wordID, tel, 1, worktime);
+    return guard;
 }
 
 
 int main()
 {
-    FILE* managerFile = fopen("manager.txt", "rw");
-    std::shared_ptr<Manager> guardPtr = nullptr;
-    if (managerFile != nullptr)
+    std::fstream managerFile;
+    managerFile.open("manager.txt");
+    systemGuard* guardPtr = nullptr;
+    if (managerFile.is_open())
     {
         
-        constexpr unsigned char buf_size = 100;
-        char buffer[buf_size];
-        std::string item = fgets(buffer, buf_size, managerFile);
+        std::string item;
+        std::getline(managerFile,item);
         /* No manager */
         if (item.empty() ||  item.find("mode:1") == std::string::npos) {
             std::cout << "A new system. Please add manager" << std::endl;
@@ -83,17 +78,19 @@ int main()
             std::cin >> inChar;
             if (inChar == 'Y' || inChar == 'y')
             {
-                std::shared_ptr<Manager> managerPtr = 
+               systemManager manager = 
                     create_manager(managerFile);
-                std::cout << "Please add guaard" << std::endl;
-                guardPtr = create_guard(managerFile);
+                std::cout << "Please add guard" << std::endl;
+                systemGuard guard = create_guard(managerFile);
+                guardPtr = &guard;
             }
         } else {
             std::cout << "Please Log in" << std::endl;
             std::cout << "Please input your wordID" <<std::endl;
             std::string wordID;
             std::cin >> wordID;
-            std::string item = fgets(buffer, buf_size, managerFile);
+            std::string item;
+            std::getline(managerFile,item);
             if (item.find(wordID) != std::string::npos)
             {
                 int preIdx = item.find("name");
@@ -103,24 +100,28 @@ int main()
                 nextIdx = item.find("address");
                 int age = std::stoi(item.substr(preIdx, nextIdx));
                 preIdx = nextIdx;
-                std::string address 
+                std::string address;
                 nextIdx = item.find("tel");
                 address = item.substr(preIdx, nextIdx);
                 preIdx = nextIdx;
                 nextIdx = item.find("worktime");
                 int tel = std::stoi(item.substr(preIdx, nextIdx));
                 nextIdx = item.find("worktime");
-                std::string worktime = item.substr(nextIdx, item.size);
-                guardPtr = std::make_shared<systemGuard>(
-                    age, name, address, wordID, tel, 0, worktime);
+                std::string worktime = item.substr(nextIdx, item.size());
+                systemGuard guard(age, name, address, wordID, tel, 0, worktime);
+                guardPtr = &guard;
+            } 
+        }
+        while(1){
+            std::string keyword;
+            std::cin >> keyword;
+            if (keyword.compare("q") == 0 || keyword.compare("Q"))
+            {
+                break;
             }
-            
-            
         }
     } 
-
-
     /* */
-    fclose(managerFile);
+    managerFile.close();
     return 0;
 }
