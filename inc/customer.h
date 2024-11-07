@@ -8,10 +8,9 @@ class Customer
         std::string park_in();
         std::string park_out();
         virtual ~Customer(){};
-    private:
+    protected:
         std::string plat_num_;
         std::string flag_;
-        Order order_;
 };
 
 class OutCarOwner: public Customer

@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <actor.h>
+
 /*----------------------------------------------------------------------------*/
 
 void SystemManager::operator +(std::string& plate)
@@ -16,7 +17,8 @@ void SystemManager::operator +(std::string& plate)
     }
     return; 
 }
-void SystemManager::operator -(std::string& plate)
+
+void delete_car(std::string& plate)
 {
     std::fstream file;
     file.open("car.txt");
@@ -41,6 +43,11 @@ void SystemManager::operator -(std::string& plate)
     return; 
 }
 
+void SystemManager::operator -(std::string& plate)
+{
+    return delete_car(plate); 
+}
+
 void SystemManager::check()
 {
     return; 
@@ -61,9 +68,39 @@ void SystemGuard::consult()
 {
     return;
 }
+
+bool is_car_exist(std::string& plate) 
+{
+    std::fstream file;
+    file.open("car.txt");
+    bool res = false;
+    if (file.is_open()) {
+        std::string _plate;
+        while (std::getline(file, _plate))
+        {
+            if (_plate.find(plate) != std::string::npos )
+            {
+                res = true;
+                break;
+            }
+        }
+        file.close();
+    }
+    return res;
+}
+
 bool SystemGuard::agree_in_out(std::string& plate)
 {
-    return;
+    bool isExist = is_car_exist(plate);
+    if (Manager::park_num < PARK_MAX && !isExist) {
+        std::lock_guard<std::mutex> lock(Manager::mtx);
+        Manager::park_num += 1;
+    } else if(Manager::park_num <= PARK_MAX && isExist){
+        std::lock_guard<std::mutex> lock(Manager::mtx);
+        Manager::park_num -= 1;
+        delete_car(plate);
+    }
+    return (Manager::park_num <= PARK_MAX);
 }
 
 void SystemGuard::report()

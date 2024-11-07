@@ -1,6 +1,8 @@
 #include <iostream>
+#include <mutex>
 #include <order.h>
 /*----------------------------------------------------------------------------*/
+#define PARK_MAX (10)
 class Manager
 {    
     public:
@@ -9,7 +11,7 @@ class Manager
             age_(age),name_(name),address_(address),wordID_(wordID),
              tel_(tel),mode_(mode),worktime_(worktime){};
         virtual ~Manager(){};
-    private:
+    protected:
         int age_;
         std::string name_;
         std::string address_;
@@ -17,8 +19,9 @@ class Manager
         int tel_;
         int mode_;
         std::string worktime_;
-        constexpr Order orderPtr;
+        constexpr Order order;
         static int park_num = 0;
+        static std::mutex mtx;
 };
 
 class SystemGuard : public Manager
