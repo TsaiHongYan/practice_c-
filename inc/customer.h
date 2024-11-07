@@ -1,19 +1,23 @@
 #include <iostream>
+#include <order.h>
 
 class Customer
 {
     public:
-        void park_in();
-        void park_out();
+        Customer();
+        std::string park_in();
+        std::string park_out();
+        virtual ~Customer(){};
     private:
         std::string plat_num_;
         std::string flag_;
+        Order order_;
 };
 
 class OutCarOwner: public Customer
 {
     public:
-        void pay();
+        float pay(Order* order);
 };
 
 class InCarOwner: public Customer

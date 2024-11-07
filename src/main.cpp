@@ -5,7 +5,7 @@
 #include <customer.h>
 #include <info.h>
 /*----------------------------------------------------------------------------*/
-systemManager create_manager(std::fstream& file)
+SystemManager create_manager(std::fstream& file)
 {
     std::cout << "Please input age " << std::endl;
     int age;
@@ -28,11 +28,11 @@ systemManager create_manager(std::fstream& file)
     file<<"wordID:"<< wordID <<"name:"<<name<<"age"<< age
         <<"address" << address << "tel" << tel << " mode:1,worktime:"
         << worktime <<std::endl;
-    systemManager manager(age, name, address, wordID, tel, 1, worktime);
+    SystemManager manager(age, name, address, wordID, tel, 1, worktime);
     return manager;
 }
 
-systemGuard create_guard(std::fstream& file)
+SystemGuard create_guard(std::fstream& file)
 {
     std::cout << "Please input age " << std::endl;
     int age;
@@ -55,7 +55,7 @@ systemGuard create_guard(std::fstream& file)
     file<<"wordID:"<< wordID <<"name:"<<name<<"age"<< age
         <<"address" << address << "tel" << tel << " mode:0,worktime:"
         << worktime <<std::endl;
-    systemGuard guard(age, name, address, wordID, tel, 1, worktime);
+    SystemGuard guard(age, name, address, wordID, tel, 1, worktime);
     return guard;
 }
 
@@ -64,7 +64,7 @@ int main()
 {
     std::fstream managerFile;
     managerFile.open("manager.txt");
-    systemGuard* guardPtr = nullptr;
+    SystemGuard* guardPtr = nullptr;
     if (managerFile.is_open())
     {
         
@@ -78,10 +78,10 @@ int main()
             std::cin >> inChar;
             if (inChar == 'Y' || inChar == 'y')
             {
-               systemManager manager = 
+               SystemManager manager = 
                     create_manager(managerFile);
                 std::cout << "Please add guard" << std::endl;
-                systemGuard guard = create_guard(managerFile);
+                SystemGuard guard = create_guard(managerFile);
                 guardPtr = &guard;
             }
         } else {
@@ -108,7 +108,7 @@ int main()
                 int tel = std::stoi(item.substr(preIdx, nextIdx));
                 nextIdx = item.find("worktime");
                 std::string worktime = item.substr(nextIdx, item.size());
-                systemGuard guard(age, name, address, wordID, tel, 0, worktime);
+                SystemGuard guard(age, name, address, wordID, tel, 0, worktime);
                 guardPtr = &guard;
             } 
         }

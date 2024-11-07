@@ -4,17 +4,7 @@
 #include <actor.h>
 /*----------------------------------------------------------------------------*/
 
-void systemManager::operator +(systemGuard& guard)
-{
-    
-    return; 
-}
-void systemManager::operator -(systemGuard& guard)
-{
-    return; 
-}
-
-void systemManager::operator +(std::string& plate)
+void SystemManager::operator +(std::string& plate)
 {
     std::ofstream file;
     file.open("car.txt");
@@ -26,7 +16,7 @@ void systemManager::operator +(std::string& plate)
     }
     return; 
 }
-void systemManager::operator -(std::string& plate)
+void SystemManager::operator -(std::string& plate)
 {
     std::fstream file;
     file.open("car.txt");
@@ -50,33 +40,33 @@ void systemManager::operator -(std::string& plate)
     }
     return; 
 }
-void systemManager::check()
+
+void SystemManager::check()
 {
     return; 
 }
-void systemManager::handlingExceptions()
+void SystemManager::handlingExceptions()
 {
+    
     return; 
 }
 
 
-float systemGuard::charge(float money)
+float SystemGuard::charge(float money)
 {
+    float delat = money - order_.GetSpend();
     return 0.0f;
 }
-void systemGuard::consult()
+void SystemGuard::consult()
 {
     return;
 }
-bool systemGuard::agree_in_out()
+bool SystemGuard::agree_in_out(std::string& plate)
 {
     return;
 }
-void systemGuard::remark()
-{
-    return;
-}
-void systemGuard::report()
+
+void SystemGuard::report()
 {
     return;
 }

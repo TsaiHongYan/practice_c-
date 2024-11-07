@@ -1,4 +1,5 @@
 #include <iostream>
+#include <order.h>
 /*----------------------------------------------------------------------------*/
 class Manager
 {    
@@ -7,6 +8,7 @@ class Manager
             std::string& wordID, int tel, int mode, std::string& worktime):
             age_(age),name_(name),address_(address),wordID_(wordID),
              tel_(tel),mode_(mode),worktime_(worktime){};
+        virtual ~Manager(){};
     private:
         int age_;
         std::string name_;
@@ -15,20 +17,21 @@ class Manager
         int tel_;
         int mode_;
         std::string worktime_;
+        constexpr Order orderPtr;
+        static int park_num = 0;
 };
 
-class systemGuard : public Manager
+class SystemGuard : public Manager
 {
     public:
-    using Manager::Manager;
-    float charge(float money);
-    void consult();
-    bool agree_in_out();
-    void remark();
-    void report();
+        using Manager::Manager;
+        float charge(float money);
+        void consult();
+        bool agree_in_out(std::string& plate);
+        void report();
 };
 
-class systemManager :public Manager
+class SystemManager :public Manager
 {
     public:
     using Manager::Manager;
