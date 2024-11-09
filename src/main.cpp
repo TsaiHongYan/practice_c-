@@ -1,9 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
-#include <actor.h>
+#include <manager.h>
 #include <customer.h>
-#include <info.h>
+#include <order.h>
 /*----------------------------------------------------------------------------*/
 SystemManager create_manager(std::fstream& file)
 {

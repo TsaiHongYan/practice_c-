@@ -1,3 +1,5 @@
+#ifndef INC_CUSTOMER_H
+#define INC_CUSTOMER_H
 #include <iostream>
 #include <order.h>
 
@@ -35,3 +37,5 @@ class SpecCarOwner:public Customer
     public:
         void remark();
 };
+
+#endif

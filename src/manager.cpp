@@ -1,9 +1,20 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <actor.h>
+#include <manager.h>
 
 /*----------------------------------------------------------------------------*/
+static int park_num = 0;
+std::mutex Manager::mtx_;
+std::mutex Manager::report_cond_mtx_;
+std::condition_variable Manager::report_cond_;
+
+SystemManager::SystemManager(int age, std::string &name, std::string& address, 
+    std::string& wordID, int tel, int mode, std::string& worktime): 
+Manager(age, name, address, wordID, tel, mode, worktime)
+{
+    doing_ = std::thread(check);
+}
 
 void SystemManager::operator +(std::string& plate)
 {
@@ -50,23 +61,52 @@ void SystemManager::operator -(std::string& plate)
 
 void SystemManager::check()
 {
-    return; 
-}
-void SystemManager::handlingExceptions()
-{
-    
+    Order order;
+    while(true) {
+        std::unique_lock<std::mutex> lock(Manager::report_cond_mtx_);
+        Manager::report_cond_.wait(lock);
+        handlingExceptions(order);
+    } 
     return; 
 }
 
-
-float SystemGuard::charge(float money)
+void SystemManager::handlingExceptions(Order& order)
 {
-    float delat = money - order_.GetSpend();
-    return 0.0f;
+    std::fstream file;
+    file.open("order.txt");
+    if (file.is_open()) {
+        std::string  the_order;
+        std::vector<std::string> lines;
+        while (std::getline(file, the_order))
+        {
+            int orderID = order.GetOrderID();
+            std::string  str_orderID = std::to_string(orderID);
+            if (the_order.find(str_orderID) != std::string::npos )
+            {
+                lines.push_back(str_orderID);
+            }
+        }
+        for(const auto line : lines)
+        {
+            file << line << std::endl;
+        }
+        file.close();
+    } else {
+        std::cout << "system error" <<std::endl;
+    }
+    return; 
 }
-void SystemGuard::consult()
+
+SystemGuard::SystemGuard(int age, std::string &name, std::string& address, 
+    std::string& wordID, int tel, int mode, std::string& worktime): 
+Manager(age, name, address, wordID, tel, mode, worktime)
 {
-    return;
+    doing_ = std::thread(report);
+}
+float SystemGuard::charge(float money, Order* order)
+{
+    float delat = money - order->GetSpend();
+    return delat;
 }
 
 bool is_car_exist(std::string& plate) 
@@ -92,18 +132,25 @@ bool is_car_exist(std::string& plate)
 bool SystemGuard::agree_in_out(std::string& plate)
 {
     bool isExist = is_car_exist(plate);
-    if (Manager::park_num < PARK_MAX && !isExist) {
-        std::lock_guard<std::mutex> lock(Manager::mtx);
-        Manager::park_num += 1;
-    } else if(Manager::park_num <= PARK_MAX && isExist){
-        std::lock_guard<std::mutex> lock(Manager::mtx);
-        Manager::park_num -= 1;
-        delete_car(plate);
+    if (park_num < PARK_MAX && !isExist) {
+        std::lock_guard<std::mutex> lock(Manager::mtx_);
+        park_num += 1;
+    } else if(park_num <= PARK_MAX && isExist){
+        if (false) 
+        {
+            ;
+        } else {
+            std::lock_guard<std::mutex> lock(Manager::mtx_);
+            park_num -= 1;
+            delete_car(plate);
+        }
     }
-    return (Manager::park_num <= PARK_MAX);
+    return (park_num <= PARK_MAX);
 }
 
 void SystemGuard::report()
 {
+    std::unique_lock<std::mutex> lock(Manager::report_cond_mtx_);
+    Manager::report_cond_.notify_all();
     return;
 }
