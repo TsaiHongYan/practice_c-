@@ -5,15 +5,19 @@
 
 /*----------------------------------------------------------------------------*/
 static int park_num = 0;
+int g_id;
 std::mutex Manager::mtx_;
 std::mutex Manager::report_cond_mtx_;
 std::condition_variable Manager::report_cond_;
+
+void report(int* id);
+void check(int id);
 
 SystemManager::SystemManager(int age, std::string &name, std::string& address, 
     std::string& wordID, int tel, int mode, std::string& worktime): 
 Manager(age, name, address, wordID, tel, mode, worktime)
 {
-    doing_ = std::thread(check);
+    doing_ = std::thread(&SystemManager::check, this, g_id);
 }
 
 void SystemManager::operator +(std::string& plate)
@@ -59,35 +63,31 @@ void SystemManager::operator -(std::string& plate)
     return delete_car(plate); 
 }
 
-void SystemManager::check()
+void SystemManager::check(int id)
 {
-    Order order;
     while(true) {
-        std::unique_lock<std::mutex> lock(Manager::report_cond_mtx_);
-        Manager::report_cond_.wait(lock);
-        handlingExceptions(order);
+        std::unique_lock<std::mutex> lock(report_cond_mtx_);
+        report_cond_.wait(lock);
+        handlingExceptions(id);
     } 
     return; 
 }
 
-void SystemManager::handlingExceptions(Order& order)
+void SystemManager::handlingExceptions(int orderID)
 {
     std::fstream file;
     file.open("order.txt");
     if (file.is_open()) {
         std::string  the_order;
         std::vector<std::string> lines;
-        while (std::getline(file, the_order))
-        {
-            int orderID = order.GetOrderID();
-            std::string  str_orderID = std::to_string(orderID);
-            if (the_order.find(str_orderID) != std::string::npos )
+        while (std::getline(file, the_order)){
+            std::string str_orderID = std::to_string(orderID);
+            if (the_order.find(str_orderID) != std::string::npos)
             {
                 lines.push_back(str_orderID);
             }
         }
-        for(const auto line : lines)
-        {
+        for(const auto line : lines) {
             file << line << std::endl;
         }
         file.close();
@@ -101,8 +101,9 @@ SystemGuard::SystemGuard(int age, std::string &name, std::string& address,
     std::string& wordID, int tel, int mode, std::string& worktime): 
 Manager(age, name, address, wordID, tel, mode, worktime)
 {
-    doing_ = std::thread(report);
+    doing_ = std::thread(&SystemGuard::report,this, &g_id);
 }
+
 float SystemGuard::charge(float money, Order* order)
 {
     float delat = money - order->GetSpend();
@@ -136,21 +137,48 @@ bool SystemGuard::agree_in_out(std::string& plate)
         std::lock_guard<std::mutex> lock(Manager::mtx_);
         park_num += 1;
     } else if(park_num <= PARK_MAX && isExist){
-        if (false) 
-        {
-            ;
-        } else {
-            std::lock_guard<std::mutex> lock(Manager::mtx_);
-            park_num -= 1;
-            delete_car(plate);
-        }
+        std::lock_guard<std::mutex> lock(Manager::mtx_);
+        park_num -= 1;
+        delete_car(plate);  
     }
     return (park_num <= PARK_MAX);
 }
 
-void SystemGuard::report()
+void SystemGuard::report(int* id)
 {
-    std::unique_lock<std::mutex> lock(Manager::report_cond_mtx_);
-    Manager::report_cond_.notify_all();
+    while(true)
+    {
+        std::fstream file;
+        auto now = std::chrono::system_clock::now();
+        std::time_t t = std::chrono::system_clock::to_time_t(now);
+        std::tm* time = std::localtime(&t);
+        file.open("order.txt");
+        bool isOuttime = false;
+        if (file.is_open()) 
+        {
+            std::string line;
+            while (std::getline(file, line)){
+                int nextIdx = line.find("remark");
+                int preIdx = line.find_last_of("-") + 1;
+                int in_time = std::stoi(line.substr(preIdx, nextIdx));
+                isOuttime = (time->tm_hour - in_time > 5);
+                nextIdx = line.find("plate");
+                preIdx = line.find("orderID:") + 
+                    std::string("orderID:").size();
+                *id = std::stoi(line.substr(preIdx, nextIdx));
+                if (isOuttime) 
+                {
+                    break;
+                }
+            }
+            file.close();
+        } else {
+            std::cout << "order system error" << std::endl;
+        }
+        if (isOuttime) {
+            std::unique_lock<std::mutex> lock(Manager::report_cond_mtx_);
+            Manager::report_cond_.notify_all();
+        }
+    }
     return;
 }

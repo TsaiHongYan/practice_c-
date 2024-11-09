@@ -16,6 +16,7 @@ class Manager
             age_(age),name_(name),address_(address),wordID_(wordID),
              tel_(tel),mode_(mode),worktime_(worktime){
             };
+        Manager() = default;
         virtual ~Manager(){
             ;
         };
@@ -38,6 +39,7 @@ class SystemGuard : public Manager
     public:
         SystemGuard(int age, std::string &name, std::string& address,
             std::string& wordID, int tel, int mode, std::string& worktime);
+        SystemGuard() = default;
         float charge(float money, Order* order);
         bool agree_in_out(std::string& plate);
         ~SystemGuard(){
@@ -47,26 +49,25 @@ class SystemGuard : public Manager
              }
         }
     private:
-        void report();
-    
+        void report(int* id);
 };
 
-class SystemManager :public Manager
+class SystemManager : public Manager
 {
     public:
         SystemManager(int age, std::string &name, std::string& address,
-                std::string& wordID, int tel, int mode, std::string& worktime):
-        Manager( age, name,  address, wordID, tel,  mode, worktime);
+                std::string& wordID, int tel, int mode, std::string& worktime);
+        SystemManager() = default;
         void operator +(std::string& plate);
         void operator -(std::string& plate);
-        void handlingExceptions(Order& order);
+        void handlingExceptions(int orderID);
         ~SystemManager (){
             if (doing_.joinable())
              {
                 doing_.join();
              }
         }
-    private:
-        void check();
+    private :
+        void check(int id);
 };
 #endif
