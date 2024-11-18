@@ -17,7 +17,7 @@ SystemManager::SystemManager(int age, std::string &name, std::string& address,
     std::string& wordID, int tel, int mode, std::string& worktime): 
 Manager(age, name, address, wordID, tel, mode, worktime)
 {
-    doing_ = std::thread(&SystemManager::check, this, g_id);
+   // doing_ = std::thread(&SystemManager::check, this, g_id);
 }
 
 SystemManager::SystemManager(const SystemManager& manager)
@@ -29,7 +29,7 @@ SystemManager::SystemManager(const SystemManager& manager)
 void SystemManager::operator +(std::string& plate)
 {
     std::ofstream file;
-    file.open("car.txt");
+    file.open("../data/car.txt");
     if (file.is_open()) {
         file << "plate:" << plate << std::endl;
         file.close();
@@ -42,7 +42,7 @@ void SystemManager::operator +(std::string& plate)
 void delete_car(std::string& plate)
 {
     std::fstream file;
-    file.open("car.txt");
+    file.open("../data/car.txt");
     if (file.is_open()) {
         std::string _plate;
         std::vector<std::string> lines;
@@ -82,7 +82,7 @@ void SystemManager::check(int id)
 void SystemManager::handlingExceptions(int orderID)
 {
     std::fstream file;
-    file.open("order.txt");
+    file.open("../data/order.txt");
     if (file.is_open()) {
         std::string  the_order;
         std::vector<std::string> lines;
@@ -107,7 +107,7 @@ SystemGuard::SystemGuard(int age, std::string &name, std::string& address,
     std::string& wordID, int tel, int mode, std::string& worktime): 
 Manager(age, name, address, wordID, tel, mode, worktime)
 {
-    doing_ = std::thread(&SystemGuard::report,this, &g_id);
+   // doing_ = std::thread(&SystemGuard::report,this, &g_id);
 }
 
 SystemGuard::SystemGuard(const SystemGuard& guard)
@@ -125,7 +125,7 @@ float SystemGuard::charge(float money, Order* order)
 bool is_car_exist(std::string& plate) 
 {
     std::fstream file;
-    file.open("car.txt");
+    file.open("../data/car.txt");
     bool res = false;
     if (file.is_open()) {
         std::string _plate;
@@ -164,7 +164,7 @@ void SystemGuard::report(int* id)
         auto now = std::chrono::system_clock::now();
         std::time_t t = std::chrono::system_clock::to_time_t(now);
         std::tm* time = std::localtime(&t);
-        file.open("order.txt");
+        file.open("../data/order.txt");
         bool isOuttime = false;
         if (file.is_open()) 
         {
@@ -185,7 +185,7 @@ void SystemGuard::report(int* id)
             }
             file.close();
         } else {
-            std::cout << "order system error" << std::endl;
+            std::cout << "report order system error" << std::endl;
         }
         if (isOuttime) {
             std::unique_lock<std::mutex> lock(Manager::report_cond_mtx_);

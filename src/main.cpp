@@ -24,10 +24,10 @@ SystemManager create_manager(std::fstream& file)
     std::cin >> tel;
     std::cout << "Please input worktime" << std::endl;
     std::string worktime;
-    std::cin >> tel;
+    std::cin >> worktime;
     file<<"wordID:"<< wordID <<"name:"<<name<<"age"<< age
         <<"address" << address << "tel" << tel << " mode:1,worktime:"
-        << worktime <<std::endl;
+        << worktime << "\n";
     SystemManager manager(age, name, address, wordID, tel, 1, worktime);
     return manager;
 }
@@ -51,7 +51,7 @@ SystemGuard create_guard(std::fstream& file)
     std::cin >> tel;
     std::cout << "Please input worktime" << std::endl;
     std::string worktime;
-    std::cin >> tel;
+    std::cin >> worktime;
     file<<"wordID:"<< wordID <<"name:"<<name<<"age"<< age
         <<"address" << address << "tel" << tel << " mode:0,worktime:"
         << worktime <<std::endl;
@@ -63,7 +63,7 @@ SystemGuard create_guard(std::fstream& file)
 int main()
 {
     std::fstream managerFile;
-    managerFile.open("manager.txt");
+    managerFile.open("../data/manager.txt");
     SystemGuard* guardPtr = nullptr;
     if (managerFile.is_open())
     {
@@ -106,7 +106,6 @@ int main()
                 preIdx = nextIdx;
                 nextIdx = item.find("worktime");
                 int tel = std::stoi(item.substr(preIdx, nextIdx));
-                nextIdx = item.find("worktime");
                 std::string worktime = item.substr(nextIdx, item.size());
                 SystemGuard guard(age, name, address, wordID, tel, 0, worktime);
                 guardPtr = &guard;
@@ -115,7 +114,7 @@ int main()
         while(1){
             std::string keyword;
             std::cin >> keyword;
-            if (keyword.compare("q") == 0 || keyword.compare("Q"))
+            if (keyword.compare("q") == 0 || keyword.compare("Q") == 0)
             {
                 break;
             }

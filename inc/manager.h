@@ -43,10 +43,10 @@ class SystemGuard : public Manager
         float charge(float money, Order* order);
         bool agree_in_out(std::string& plate);
         ~SystemGuard(){
-            if (doing_.joinable())
-             {
-                doing_.join();
-             }
+            // if (doing_.joinable())
+            //  {
+            //     doing_.join();
+            //  }
         }
     private:
         void report(int* id);
@@ -62,10 +62,11 @@ class SystemManager : public Manager
         void operator -(std::string& plate);
         void handlingExceptions(int orderID);
         ~SystemManager (){
-            if (doing_.joinable())
-             {
-                doing_.join();
-             }
+            // if (doing_.joinable())
+            //  {
+            //     std::cout << "wait join in" << std::endl;
+            //     doing_.join();
+            //  }
         }
     private :
         void check(int id);

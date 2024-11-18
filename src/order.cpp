@@ -14,7 +14,7 @@ Order::Order(std::string& plate) {
     orderID++;
     /* Visit car.txt*/
     std::fstream file;
-    file.open("order.txt");
+    file.open("../data/order.txt");
     if (file.is_open()) {
         file << "orderID:"<<orderID_ << "plate:"<< plate_
               <<"in time:"<< in_time_->tm_year << "-" << 
