@@ -39,7 +39,7 @@ class SystemGuard : public Manager
     public:
         SystemGuard(int age, std::string &name, std::string& address,
             std::string& wordID, int tel, int mode, std::string& worktime);
-        SystemGuard() = default;
+        SystemGuard(const SystemGuard& guard);
         float charge(float money, Order* order);
         bool agree_in_out(std::string& plate);
         ~SystemGuard(){
@@ -57,7 +57,7 @@ class SystemManager : public Manager
     public:
         SystemManager(int age, std::string &name, std::string& address,
                 std::string& wordID, int tel, int mode, std::string& worktime);
-        SystemManager() = default;
+        SystemManager(const SystemManager& manager);
         void operator +(std::string& plate);
         void operator -(std::string& plate);
         void handlingExceptions(int orderID);

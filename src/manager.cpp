@@ -20,6 +20,12 @@ Manager(age, name, address, wordID, tel, mode, worktime)
     doing_ = std::thread(&SystemManager::check, this, g_id);
 }
 
+SystemManager::SystemManager(const SystemManager& manager)
+{
+    ;
+}
+
+
 void SystemManager::operator +(std::string& plate)
 {
     std::ofstream file;
@@ -103,6 +109,12 @@ Manager(age, name, address, wordID, tel, mode, worktime)
 {
     doing_ = std::thread(&SystemGuard::report,this, &g_id);
 }
+
+SystemGuard::SystemGuard(const SystemGuard& guard)
+{
+    ;
+}
+
 
 float SystemGuard::charge(float money, Order* order)
 {

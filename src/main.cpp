@@ -121,7 +121,6 @@ int main()
             }
         }
     } 
-    /* */
     managerFile.close();
     return 0;
 }
