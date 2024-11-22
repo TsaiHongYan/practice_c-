@@ -17,7 +17,8 @@ SystemManager::SystemManager(int age, std::string &name, std::string& address,
     std::string& wordID, int tel, int mode, std::string& worktime): 
 Manager(age, name, address, wordID, tel, mode, worktime)
 {
-   // doing_ = std::thread(&SystemManager::check, this, g_id);
+    is_stop = false;
+    doing_ = std::thread(&SystemManager::check, this, g_id);
 }
 
 SystemManager::SystemManager(const SystemManager& manager)
@@ -25,6 +26,13 @@ SystemManager::SystemManager(const SystemManager& manager)
     ;
 }
 
+SystemManager::~SystemManager(){
+    is_stop = true;
+    if (doing_.joinable())
+    {
+        doing_.join();
+    }
+}
 
 void SystemManager::operator +(std::string& plate)
 {
@@ -71,9 +79,10 @@ void SystemManager::operator -(std::string& plate)
 
 void SystemManager::check(int id)
 {
-    while(true) {
+    auto now = std::chrono::system_clock::now();
+    while(is_stop == false) {
         std::unique_lock<std::mutex> lock(report_cond_mtx_);
-        report_cond_.wait(lock);
+        report_cond_.wait_for(lock, std::chrono::seconds(2));
         handlingExceptions(id);
     } 
     return; 
@@ -107,12 +116,21 @@ SystemGuard::SystemGuard(int age, std::string &name, std::string& address,
     std::string& wordID, int tel, int mode, std::string& worktime): 
 Manager(age, name, address, wordID, tel, mode, worktime)
 {
-   // doing_ = std::thread(&SystemGuard::report,this, &g_id);
+    is_stop = false;
+    doing_ = std::thread(&SystemGuard::report,this, &g_id);
 }
 
 SystemGuard::SystemGuard(const SystemGuard& guard)
 {
     ;
+}
+
+SystemGuard::~SystemGuard(){
+    is_stop = true;
+    if (doing_.joinable())
+    {
+        doing_.join();
+    }
 }
 
 
@@ -158,7 +176,7 @@ bool SystemGuard::agree_in_out(std::string& plate)
 
 void SystemGuard::report(int* id)
 {
-    while(true)
+    while(is_stop == false) 
     {
         std::fstream file;
         auto now = std::chrono::system_clock::now();
